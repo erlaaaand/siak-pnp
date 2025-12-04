@@ -4,20 +4,20 @@ require 'config/database.php';
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 
-echo "Memulai setup database SIAK (Student Login Only)...\n";
+echo "Memulai setup database SIAK Final (Support Pra/Pasca Kuliah)...\n";
 
-// 1. TABEL USERS (Hanya untuk Mahasiswa)
+// 1. TABEL USERS
 if (!Capsule::schema()->hasTable('users')) {
     Capsule::schema()->create('users', function ($table) {
         $table->id();
-        $table->string('nama_lengkap', 100)->unique(); // Username untuk login
+        $table->string('nama_lengkap', 100)->unique();
         $table->string('password');
         $table->timestamps();
     });
-    echo "[OK] Tabel 'users' berhasil dibuat.\n";
+    echo "[OK] Tabel 'users' dibuat.\n";
 }
 
-// 2. TABEL JURUSAN & PRODI (Master Data)
+// 2. TABEL MASTER (Jurusan & Prodi)
 if (!Capsule::schema()->hasTable('jurusans')) {
     Capsule::schema()->create('jurusans', function ($table) {
         $table->id();
@@ -26,7 +26,6 @@ if (!Capsule::schema()->hasTable('jurusans')) {
         $table->timestamps();
     });
 }
-
 if (!Capsule::schema()->hasTable('program_studis')) {
     Capsule::schema()->create('program_studis', function ($table) {
         $table->id();
@@ -38,59 +37,59 @@ if (!Capsule::schema()->hasTable('program_studis')) {
     });
 }
 
-// 3. TABEL MAHASISWA (Inti Perubahan di sini)
+// 3. TABEL MAHASISWA (Update: Tambah Kelas Profil)
 if (!Capsule::schema()->hasTable('mahasiswas')) {
     Capsule::schema()->create('mahasiswas', function ($table) {
         $table->string('nim', 20)->primary();
-        
-        // Relasi One-to-One ke Users (Nullable, diisi saat Register)
-        // Unique: Agar 1 akun user tidak bisa dipakai 2 mahasiswa berbeda
         $table->foreignId('user_id')->nullable()->unique()->constrained('users')->onDelete('set null');
         
-        $table->string('nama', 100); // Nama sesuai data akademik
+        $table->string('nama', 100);
         $table->string('tempat_lahir', 50)->nullable();
         $table->date('tanggal_lahir')->nullable();
         $table->enum('jenis_kelamin', ['L', 'P']);
+        
         $table->foreignId('prodi_id')->constrained('program_studis');
+        
+        // FITUR BARU: Untuk menu 'Daftar Mahasiswa Kelas' (Pra-kuliah)
+        $table->string('kelas_profil', 10)->nullable(); // Contoh: 'III.A', 'III.B'
+        $table->integer('semester_aktif')->default(1);  // Contoh: 5
+        
         $table->year('angkatan');
         $table->string('foto')->nullable();
         $table->timestamps();
         $table->softDeletes();
         
-        // Index nama untuk mempercepat pencocokan saat Register
         $table->index('nama');
+        $table->index('kelas_profil'); // Index biar pencarian teman sekelas cepat
     });
-    echo "[OK] Tabel 'mahasiswas' (Linked to Users) berhasil dibuat.\n";
+    echo "[OK] Tabel 'mahasiswas' (Support Kelas) dibuat.\n";
 }
 
-// 4. TABEL DOSEN (Tanpa User ID)
+// 4. TABEL DOSEN
 if (!Capsule::schema()->hasTable('dosens')) {
     Capsule::schema()->create('dosens', function ($table) {
         $table->string('nidn', 20)->primary();
-        // HAPUS kolom user_id disini
         $table->string('nama', 100);
+        $table->string('gelar_depan', 50)->nullable();
+        $table->string('gelar_belakang', 50)->nullable();
         $table->enum('jenis_kelamin', ['L', 'P']);
         $table->foreignId('jurusan_id')->nullable()->constrained('jurusans');
         $table->string('foto')->nullable();
         $table->timestamps();
     });
-    echo "[OK] Tabel 'dosens' berhasil dibuat.\n";
 }
 
-// 5. Tabel Tahun Akademik
+// 5. TABEL AKADEMIK (Tahun, MK, Ruangan)
 if (!Capsule::schema()->hasTable('tahun_akademiks')) {
     Capsule::schema()->create('tahun_akademiks', function ($table) {
         $table->id();
-        $table->string('kode', 10)->unique(); // 20241
-        $table->string('tahun', 9); // 2024/2025
+        $table->string('kode', 10)->unique();
+        $table->string('tahun', 9);
         $table->enum('semester', ['Ganjil', 'Genap']);
         $table->boolean('is_aktif')->default(0);
         $table->timestamps();
     });
-    echo "[OK] Tabel 'tahun_akademiks' berhasil dibuat.\n";
 }
-
-// 6. Tabel Matakuliah
 if (!Capsule::schema()->hasTable('matakuliahs')) {
     Capsule::schema()->create('matakuliahs', function ($table) {
         $table->id();
@@ -98,13 +97,10 @@ if (!Capsule::schema()->hasTable('matakuliahs')) {
         $table->string('nama_mk', 100);
         $table->integer('sks');
         $table->integer('semester_paket')->nullable();
-        $table->foreignId('prodi_id')->constrained('program_studis')->onDelete('cascade');
+        $table->foreignId('prodi_id')->constrained('program_studis');
         $table->timestamps();
     });
-    echo "[OK] Tabel 'matakuliahs' berhasil dibuat.\n";
 }
-
-// 7. Tabel Ruangan
 if (!Capsule::schema()->hasTable('ruangans')) {
     Capsule::schema()->create('ruangans', function ($table) {
         $table->id();
@@ -113,10 +109,9 @@ if (!Capsule::schema()->hasTable('ruangans')) {
         $table->integer('kapasitas')->nullable();
         $table->timestamps();
     });
-    echo "[OK] Tabel 'ruangans' berhasil dibuat.\n";
 }
 
-// 8. Tabel Jadwal Kelas (Penghubung Dosen, MK, Ruang)
+// 6. JADWAL KELAS (Support Pra-kuliah: Daftar MK Kelas, Daftar Dosen Kelas)
 if (!Capsule::schema()->hasTable('jadwal_kelas')) {
     Capsule::schema()->create('jadwal_kelas', function ($table) {
         $table->id();
@@ -128,37 +123,34 @@ if (!Capsule::schema()->hasTable('jadwal_kelas')) {
         
         $table->foreignId('ruangan_id')->nullable()->constrained('ruangans');
         
-        $table->string('nama_kelas', 10)->nullable(); // 3A, 3B
+        // Penting untuk grouping "Daftar Mata Kuliah Kelas 3A"
+        $table->string('nama_kelas', 10)->nullable(); 
+        
         $table->enum('hari', ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'])->nullable();
         $table->time('jam_mulai')->nullable();
         $table->time('jam_selesai')->nullable();
         $table->integer('kuota')->default(30);
         $table->timestamps();
     });
-    echo "[OK] Tabel 'jadwal_kelas' berhasil dibuat.\n";
 }
 
-// 9. Tabel KRS (Kartu Rencana Studi + Nilai)
+// 7. KRS & KHS (Support Perkuliahan & Pasca-kuliah)
 if (!Capsule::schema()->hasTable('krs')) {
     Capsule::schema()->create('krs', function ($table) {
         $table->id();
-        
         $table->string('nim', 20);
         $table->foreign('nim')->references('nim')->on('mahasiswas')->onDelete('cascade');
-        
         $table->foreignId('jadwal_kelas_id')->constrained('jadwal_kelas')->onDelete('cascade');
         
         $table->decimal('nilai_angka', 5, 2)->default(0);
         $table->char('nilai_huruf', 2)->nullable();
         $table->decimal('bobot', 3, 2)->nullable();
-        $table->boolean('is_disetujui')->default(0);
+        $table->boolean('is_disetujui')->default(1);
         
         $table->timestamps();
-        
-        // Unique constraint agar mhs tidak ambil kelas sama 2x
         $table->unique(['nim', 'jadwal_kelas_id']);
     });
-    echo "[OK] Tabel 'krs' berhasil dibuat.\n";
+    echo "[OK] Tabel 'krs' (Nilai & Transkrip) dibuat.\n";
 }
 
-echo "\nSemua tabel berhasil dikonfigurasi!\n";
+echo "\nDatabase Setup Final Selesai!\n";
