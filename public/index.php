@@ -134,6 +134,10 @@ try {
             }
             break;
 
+        case 'admin':
+            require '../app/Controllers/AdminController.php';
+            $controller = new App\Controllers\AdminController();
+
         // === 404 PAGE ===
         default:
             http_response_code(404);
