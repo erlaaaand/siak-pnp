@@ -1,144 +1,162 @@
 <?php
+// Aktifkan error reporting untuk development
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 session_start();
 require '../vendor/autoload.php';
 require '../config/database.php';
 
-// --- ROUTING SEDERHANA ---
-
-// Ambil parameter page, default ke 'login'
-$page = $_GET['page'] ?? 'login';
-$action = $_GET['action'] ?? 'index';
-
-// Cek sesi login (Kecuali halaman login/register)
-if (!isset($_SESSION['is_login']) && !in_array($page, ['login', 'register', 'auth_login', 'auth_register'])) {
-    header("Location: index.php?page=login");
+// Fungsi untuk redirect dengan pesan
+function redirect($page, $type = 'error', $message = '') {
+    if (!empty($message)) {
+        $_SESSION[$type] = $message;
+    }
+    header("Location: index.php?page=$page");
     exit;
 }
 
-// Switch Controller
-switch ($page) {
-    case 'login':
-        require '../views/auth/login.php';
-        break;
+// Fungsi untuk cek autentikasi
+function checkAuth() {
+    if (!isset($_SESSION['is_login']) || $_SESSION['is_login'] !== true) {
+        redirect('login', 'error', 'Silakan login terlebih dahulu!');
+    }
+}
+
+// Ambil parameter page dan action
+$page = $_GET['page'] ?? 'login';
+$action = $_GET['action'] ?? 'index';
+
+// Whitelist halaman publik (tidak perlu login)
+$publicPages = ['login', 'register', 'auth_login', 'auth_register'];
+
+// Cek autentikasi untuk halaman yang memerlukan login
+if (!in_array($page, $publicPages)) {
+    checkAuth();
+}
+
+try {
+    // Routing dengan switch
+    switch ($page) {
+        // === AUTH PAGES ===
+        case 'login':
+            if (isset($_SESSION['is_login'])) {
+                redirect('dashboard');
+            }
+            require '../views/auth/login.php';
+            break;
+        
+        case 'register':
+            if (isset($_SESSION['is_login'])) {
+                redirect('dashboard');
+            }
+            require '../views/auth/register.php';
+            break;
+
+        case 'auth_login':
+            if (isset($_SESSION['is_login'])) {
+                redirect('dashboard');
+            }
+            require '../app/Controllers/AuthController.php';
+            $controller = new App\Controllers\AuthController();
+            $controller->login();
+            break;
+
+        case 'auth_register':
+            if (isset($_SESSION['is_login'])) {
+                redirect('dashboard');
+            }
+            require '../app/Controllers/AuthController.php';
+            $controller = new App\Controllers\AuthController();
+            $controller->register();
+            break;
+
+        case 'logout':
+            session_destroy();
+            redirect('login', 'success', 'Anda telah berhasil logout.');
+            break;
+
+        // === DASHBOARD ===
+        case 'dashboard':
+            require '../app/Controllers/DashboardController.php';
+            $controller = new App\Controllers\DashboardController();
+            $controller->index();
+            break;
+
+        // === KRS ===
+        case 'krs':
+            require '../app/Controllers/KrsController.php';
+            $controller = new App\Controllers\KrsController();
+            
+            switch ($action) {
+                case 'tambah':
+                    $controller->tambah();
+                    break;
+                case 'store':
+                    $controller->store();
+                    break;
+                case 'hapus':
+                    $controller->hapus();
+                    break;
+                default:
+                    $controller->index();
+            }
+            break;
+
+        // === JADWAL ===
+        case 'jadwal':
+            require '../app/Controllers/JadwalController.php';
+            $controller = new App\Controllers\JadwalController();
+            $controller->index();
+            break;
+
+        // === NILAI ===
+        case 'nilai':
+            require '../app/Controllers/NilaiController.php';
+            $controller = new App\Controllers\NilaiController();
+            $controller->index();
+            break;
+
+        // === PROFIL ===
+        case 'profil':
+            require '../app/Controllers/ProfilController.php';
+            $controller = new App\Controllers\ProfilController();
+            
+            switch ($action) {
+                case 'update':
+                    $controller->update();
+                    break;
+                case 'change_password':
+                    $controller->changePassword();
+                    break;
+                default:
+                    $controller->index();
+            }
+            break;
+
+        // === 404 PAGE ===
+        default:
+            http_response_code(404);
+            $errorTitle = "404 - Halaman Tidak Ditemukan";
+            $errorMessage = "Maaf, halaman yang Anda cari tidak tersedia.";
+            require '../views/errors/404.php';
+            break;
+    }
+
+} catch (\Exception $e) {
+    // Log error untuk debugging
+    error_log("Application Error: " . $e->getMessage());
+    error_log("Stack trace: " . $e->getTraceAsString());
     
-    case 'register':
-        require '../views/auth/register.php';
-        break;
-
-    case 'auth_login': // Proses Login
-        require '../app/Controllers/AuthController.php';
-        $auth = new App\Controllers\AuthController();
-        $auth->login();
-        break;
-
-    case 'auth_register': // Proses Register
-        require '../app/Controllers/AuthController.php';
-        $auth = new App\Controllers\AuthController();
-        $auth->register();
-        break;
-
-    case 'logout':
-        session_destroy();
-        header("Location: index.php?page=login");
-        break;
-
-    case 'dashboard':
-        require '../app/Controllers/DashboardController.php';
-        $controller = new App\Controllers\DashboardController();
-        $controller->index();
-        break;
-
-    case 'krs':
-        require '../app/Controllers/KrsController.php';
-        $controller = new App\Controllers\KrsController();
-        if ($action == 'tambah') {
-            $controller->tambah();
-        } elseif ($action == 'store') {
-            $controller->store();
-        } elseif ($action == 'hapus') {
-            $controller->hapus();
-        } else {
-            $controller->index();
-        }
-        break;
-
-    case 'jadwal':
-        require '../app/Controllers/JadwalController.php';
-        $controller = new App\Controllers\JadwalController();
-        $controller->index();
-        break;
-
-    case 'nilai':
-        require '../app/Controllers/NilaiController.php';
-        $controller = new App\Controllers\NilaiController();
-        $controller->index();
-        break;
-
-    case 'profil':
-        require '../app/Controllers/ProfilController.php';
-        $controller = new App\Controllers\ProfilController();
-        if ($action == 'update') {
-            $controller->update();
-        } elseif ($action == 'change_password') {
-            $controller->changePassword();
-        } else {
-            $controller->index();
-        }
-        break;
-
-    default:
-        http_response_code(404);
-        echo "<!DOCTYPE html>
-<html lang='id'>
-<head>
-    <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>404 - Halaman Tidak Ditemukan</title>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .error-container {
-            background: white;
-            padding: 60px 40px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 500px;
-        }
-        h1 {
-            font-size: 72px;
-            color: #667eea;
-            margin-bottom: 20px;
-        }
-        p {
-            color: #64748b;
-            margin-bottom: 30px;
-        }
-        a {
-            display: inline-block;
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-        }
-    </style>
-</head>
-<body>
-    <div class='error-container'>
-        <h1>404</h1>
-        <h2 style='color: #1e293b; margin-bottom: 15px;'>Halaman Tidak Ditemukan</h2>
-        <p>Maaf, halaman yang Anda cari tidak tersedia.</p>
-        <a href='index.php?page=dashboard'>Kembali ke Dashboard</a>
-    </div>
-</body>
-</html>";
-        break;
+    // Tampilkan error page yang user-friendly
+    http_response_code(500);
+    $errorTitle = "500 - Terjadi Kesalahan";
+    $errorMessage = "Terjadi kesalahan pada sistem. Silakan coba lagi nanti.";
+    
+    // Tampilkan detail error hanya di development mode
+    if (getenv('APP_ENV') === 'development' || !getenv('APP_ENV')) {
+        $errorMessage .= "<br><br><strong>Detail Error:</strong><br>" . $e->getMessage();
+    }
+    
+    require '../views/errors/500.php';
 }
