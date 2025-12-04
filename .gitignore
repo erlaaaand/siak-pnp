@@ -1,0 +1,16 @@
+/vendor/
+
+.env
+
+.idea/
+.vscode/
+*.swp
+*.swo
+
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+*.log
+error_log
