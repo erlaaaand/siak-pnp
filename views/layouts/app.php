@@ -1,3 +1,7 @@
+<?php
+$viewMode = $_SESSION['view_mode'] ?? 'student';
+$isAdminMode = ($viewMode === 'admin');
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -26,10 +30,11 @@
             top: 0;
             height: 100vh;
             width: 280px;
-            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            background: linear-gradient(180deg, <?= $isAdminMode ? '#dc2626 0%, #991b1b 100%' : '#1e293b 0%, #0f172a 100%' ?>);
             padding: 0;
             z-index: 1000;
             box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            transition: background 0.3s ease;
         }
 
         .sidebar-brand {
@@ -52,6 +57,53 @@
             font-size: 13px;
             margin-top: 8px;
             font-weight: 400;
+        }
+
+        /* Mode Toggle */
+        .mode-toggle {
+            padding: 15px 25px;
+            background: rgba(255,255,255,0.08);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .mode-toggle-label {
+            color: #cbd5e1;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: block;
+            font-weight: 600;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(0,0,0,0.2);
+            padding: 8px;
+            border-radius: 10px;
+        }
+
+        .toggle-option {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            color: rgba(255,255,255,0.6);
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: block;
+        }
+
+        .toggle-option.active {
+            background: white;
+            color: <?= $isAdminMode ? '#dc2626' : '#667eea' ?>;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
         .sidebar-menu {
@@ -82,7 +134,7 @@
         }
 
         .sidebar-menu a.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: <?= $isAdminMode ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' ?>;
             color: white;
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
@@ -132,6 +184,17 @@
             gap: 20px;
         }
 
+        .mode-badge {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: <?= $isAdminMode ? 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)' : 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)' ?>;
+            color: <?= $isAdminMode ? '#991b1b' : '#1e40af' ?>;
+        }
+
         .user-info {
             display: flex;
             align-items: center;
@@ -145,7 +208,7 @@
             width: 42px;
             height: 42px;
             border-radius: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: <?= $isAdminMode ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' ?>;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -208,7 +271,7 @@
         .card-title svg {
             width: 24px;
             height: 24px;
-            color: #667eea;
+            color: <?= $isAdminMode ? '#ef4444' : '#667eea' ?>;
         }
 
         /* Buttons */
@@ -232,7 +295,7 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: <?= $isAdminMode ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' ?>;
             color: white;
         }
 
@@ -513,6 +576,20 @@
             </h1>
             <p>Sistem Informasi Akademik</p>
         </div>
+
+        <!-- Mode Toggle -->
+        <div class="mode-toggle">
+            <span class="mode-toggle-label">Mode Tampilan</span>
+            <div class="toggle-switch">
+                <a href="index.php?toggle_mode=1" class="toggle-option <?= !$isAdminMode ? 'active' : '' ?>">
+                    👤 Mahasiswa
+                </a>
+                <a href="index.php?toggle_mode=1" class="toggle-option <?= $isAdminMode ? 'active' : '' ?>">
+                    ⚙️ Admin
+                </a>
+            </div>
+        </div>
+
         <ul class="sidebar-menu">
             <li>
                 <a href="index.php?page=dashboard" class="<?= ($page ?? '') == 'dashboard' ? 'active' : '' ?>">
@@ -522,6 +599,8 @@
                     Dashboard
                 </a>
             </li>
+
+            <?php if (!$isAdminMode): ?>
             <li>
                 <a href="index.php?page=krs" class="<?= ($page ?? '') == 'krs' ? 'active' : '' ?>">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -554,6 +633,8 @@
                     Profil Saya
                 </a>
             </li>
+            <?php endif; ?>
+
             <li style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
                 <a href="index.php?page=logout" onclick="return confirm('Yakin ingin logout?')">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -574,13 +655,16 @@
                 <p><?= $headerSubtitle ?? 'Selamat datang di Sistem Informasi Akademik' ?></p>
             </div>
             <div class="header-actions">
+                <div class="mode-badge">
+                    <?= $isAdminMode ? '⚙️ Mode Admin' : '👤 Mode Mahasiswa' ?>
+                </div>
                 <div class="user-info">
                     <div class="user-avatar">
                         <?= strtoupper(substr($_SESSION['nama'] ?? 'U', 0, 1)) ?>
                     </div>
                     <div class="user-details">
                         <div class="user-name"><?= $_SESSION['nama'] ?? 'User' ?></div>
-                        <div class="user-role">Mahasiswa</div>
+                        <div class="user-role"><?= $isAdminMode ? 'Administrator' : 'Mahasiswa' ?></div>
                     </div>
                 </div>
             </div>

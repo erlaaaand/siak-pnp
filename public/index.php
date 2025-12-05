@@ -23,6 +23,13 @@ function checkAuth() {
 $page = $_GET['page'] ?? 'login';
 $action = $_GET['action'] ?? 'index';
 
+// Toggle Mode (Admin/Student)
+if (isset($_GET['toggle_mode'])) {
+    $_SESSION['view_mode'] = ($_SESSION['view_mode'] ?? 'student') === 'student' ? 'admin' : 'student';
+    header("Location: index.php?page=dashboard");
+    exit;
+}
+
 $publicPages = ['login', 'register', 'auth_login', 'auth_register'];
 
 if (!in_array($page, $publicPages)) {

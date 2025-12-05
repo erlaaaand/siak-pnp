@@ -1,6 +1,6 @@
 <?php
 $title = 'Admin Dashboard - SIAK PNP';
-$page = 'admin';
+$page = 'dashboard';
 $headerTitle = 'Admin Dashboard';
 $headerSubtitle = 'Kelola data master sistem akademik';
 
@@ -14,6 +14,7 @@ ob_start();
     margin-bottom: 25px;
     border-bottom: 2px solid #e2e8f0;
     padding-bottom: 10px;
+    flex-wrap: wrap;
 }
 
 .admin-tab {
@@ -26,6 +27,7 @@ ob_start();
     font-weight: 600;
     font-size: 14px;
     transition: all 0.3s;
+    cursor: pointer;
 }
 
 .admin-tab:hover {
@@ -34,9 +36,9 @@ ob_start();
 }
 
 .admin-tab.active {
-    background: #667eea;
+    background: #ef4444;
     color: white;
-    border-color: #667eea;
+    border-color: #ef4444;
 }
 
 .form-inline {
@@ -70,46 +72,90 @@ ob_start();
     display: flex;
     gap: 10px;
 }
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
 </style>
+
+<!-- Admin Statistics -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon blue">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+        </div>
+        <div class="stat-info">
+            <h3><?= $dosens->count() ?></h3>
+            <p>Total Dosen</p>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon green">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+        </div>
+        <div class="stat-info">
+            <h3><?= $mahasiswas->count() ?></h3>
+            <p>Total Mahasiswa</p>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon purple">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+        </div>
+        <div class="stat-info">
+            <h3><?= $matakuliahs->count() ?></h3>
+            <p>Total Matakuliah</p>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon orange">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+        </div>
+        <div class="stat-info">
+            <h3><?= $jadwals->count() ?></h3>
+            <p>Total Jadwal</p>
+        </div>
+    </div>
+</div>
 
 <div class="admin-tabs">
     <a href="#dosen" class="admin-tab active" onclick="showTab('dosen', event)">
-        <svg style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:6px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-        </svg>
-        Dosen
+        🧑‍🏫 Dosen
     </a>
     <a href="#mahasiswa" class="admin-tab" onclick="showTab('mahasiswa', event)">
-        <svg style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:6px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-        </svg>
-        Mahasiswa
+        👨‍🎓 Mahasiswa
     </a>
     <a href="#matakuliah" class="admin-tab" onclick="showTab('matakuliah', event)">
-        <svg style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:6px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-        </svg>
-        Matakuliah
+        📚 Matakuliah
     </a>
     <a href="#ruangan" class="admin-tab" onclick="showTab('ruangan', event)">
-        <svg style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:6px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-        </svg>
-        Ruangan
+        🏢 Ruangan
     </a>
     <a href="#jadwal" class="admin-tab" onclick="showTab('jadwal', event)">
-        <svg style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:6px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-        </svg>
-        Jadwal
+        📅 Jadwal
     </a>
 </div>
 
 <!-- TAB: DOSEN -->
-<div id="tab-dosen" class="tab-content">
+<div id="tab-dosen" class="tab-content active">
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">Tambah Dosen Baru</h3>
+            <h3 class="card-title">➕ Tambah Dosen Baru</h3>
         </div>
         <form action="index.php?page=admin&action=store_dosen" method="POST">
             <div class="form-inline">
@@ -136,13 +182,13 @@ ob_start();
                     </select>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Simpan Dosen</button>
+            <button type="submit" class="btn btn-primary">💾 Simpan Dosen</button>
         </form>
     </div>
 
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">Daftar Dosen</h3>
+            <h3 class="card-title">📋 Daftar Dosen</h3>
         </div>
         <div class="table-container">
             <table>
@@ -165,7 +211,7 @@ ob_start();
                         <td>
                             <a href="index.php?page=admin&action=delete_dosen&id=<?= $d->nidn ?>" 
                                class="btn btn-danger btn-sm" 
-                               onclick="return confirm('Yakin hapus dosen ini?')">Hapus</a>
+                               onclick="return confirm('Yakin hapus dosen ini?')">🗑️ Hapus</a>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -176,10 +222,10 @@ ob_start();
 </div>
 
 <!-- TAB: MAHASISWA -->
-<div id="tab-mahasiswa" class="tab-content" style="display:none;">
+<div id="tab-mahasiswa" class="tab-content">
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">Tambah Mahasiswa Baru</h3>
+            <h3 class="card-title">➕ Tambah Mahasiswa Baru</h3>
         </div>
         <form action="index.php?page=admin&action=store_mhs" method="POST">
             <div class="form-inline">
@@ -214,13 +260,13 @@ ob_start();
                     </select>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Simpan Mahasiswa</button>
+            <button type="submit" class="btn btn-primary">💾 Simpan Mahasiswa</button>
         </form>
     </div>
 
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">Daftar Mahasiswa</h3>
+            <h3 class="card-title">📋 Daftar Mahasiswa</h3>
         </div>
         <div class="table-container">
             <table>
@@ -247,7 +293,7 @@ ob_start();
                         <td>
                             <a href="index.php?page=admin&action=delete_mhs&id=<?= $m->nim ?>" 
                                class="btn btn-danger btn-sm" 
-                               onclick="return confirm('Yakin hapus mahasiswa ini?')">Hapus</a>
+                               onclick="return confirm('Yakin hapus mahasiswa ini?')">🗑️ Hapus</a>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -258,10 +304,10 @@ ob_start();
 </div>
 
 <!-- TAB: MATAKULIAH -->
-<div id="tab-matakuliah" class="tab-content" style="display:none;">
+<div id="tab-matakuliah" class="tab-content">
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">Tambah Matakuliah Baru</h3>
+            <h3 class="card-title">➕ Tambah Matakuliah Baru</h3>
         </div>
         <form action="index.php?page=admin&action=store_mk" method="POST">
             <div class="form-inline">
@@ -289,13 +335,13 @@ ob_start();
                     </select>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Simpan Matakuliah</button>
+            <button type="submit" class="btn btn-primary">💾 Simpan Matakuliah</button>
         </form>
     </div>
 
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">Daftar Matakuliah</h3>
+            <h3 class="card-title">📋 Daftar Matakuliah</h3>
         </div>
         <div class="table-container">
             <table>
@@ -320,7 +366,7 @@ ob_start();
                         <td>
                             <a href="index.php?page=admin&action=delete_mk&id=<?= $mk->id ?>" 
                                class="btn btn-danger btn-sm" 
-                               onclick="return confirm('Yakin hapus matakuliah ini?')">Hapus</a>
+                               onclick="return confirm('Yakin hapus matakuliah ini?')">🗑️ Hapus</a>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -331,10 +377,10 @@ ob_start();
 </div>
 
 <!-- TAB: RUANGAN -->
-<div id="tab-ruangan" class="tab-content" style="display:none;">
+<div id="tab-ruangan" class="tab-content">
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">Tambah Ruangan Baru</h3>
+            <h3 class="card-title">➕ Tambah Ruangan Baru</h3>
         </div>
         <form action="index.php?page=admin&action=store_ruangan" method="POST">
             <div class="form-inline">
@@ -351,13 +397,13 @@ ob_start();
                     <input type="number" name="kapasitas" value="40">
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Simpan Ruangan</button>
+            <button type="submit" class="btn btn-primary">💾 Simpan Ruangan</button>
         </form>
     </div>
 
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">Daftar Ruangan</h3>
+            <h3 class="card-title">📋 Daftar Ruangan</h3>
         </div>
         <div class="table-container">
             <table>
@@ -378,7 +424,7 @@ ob_start();
                         <td>
                             <a href="index.php?page=admin&action=delete_ruangan&id=<?= $r->id ?>" 
                                class="btn btn-danger btn-sm" 
-                               onclick="return confirm('Yakin hapus ruangan ini?')">Hapus</a>
+                               onclick="return confirm('Yakin hapus ruangan ini?')">🗑️ Hapus</a>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -389,10 +435,10 @@ ob_start();
 </div>
 
 <!-- TAB: JADWAL -->
-<div id="tab-jadwal" class="tab-content" style="display:none;">
+<div id="tab-jadwal" class="tab-content">
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">Daftar Jadwal Kelas</h3>
+            <h3 class="card-title">📋 Daftar Jadwal Kelas</h3>
         </div>
         <div class="table-container">
             <table>
@@ -431,16 +477,16 @@ function showTab(tabName, event) {
     
     // Hide all tabs
     document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.style.display = 'none';
+        tab.classList.remove('active');
     });
     
-    // Remove active class from all tabs
+    // Remove active class from all tab buttons
     document.querySelectorAll('.admin-tab').forEach(tab => {
         tab.classList.remove('active');
     });
     
     // Show selected tab
-    document.getElementById('tab-' + tabName).style.display = 'block';
+    document.getElementById('tab-' + tabName).classList.add('active');
     event.target.classList.add('active');
 }
 </script>
