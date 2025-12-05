@@ -70,7 +70,7 @@ ob_start();
 
 .btn-group {
     display: flex;
-    gap: 10px;
+    gap: 8px;
 }
 
 .tab-content {
@@ -79,6 +79,89 @@ ob_start();
 
 .tab-content.active {
     display: block;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: slideDown 0.3s;
+}
+
+@keyframes slideDown {
+    from { 
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to { 
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    padding: 25px 30px;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border-radius: 16px 16px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.close {
+    color: white;
+    font-size: 32px;
+    font-weight: 300;
+    cursor: pointer;
+    transition: 0.3s;
+    line-height: 1;
+}
+
+.close:hover {
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+}
+
+.btn-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
 }
 </style>
 
@@ -160,22 +243,22 @@ ob_start();
         <form action="index.php?page=admin&action=store_dosen" method="POST">
             <div class="form-inline">
                 <div class="form-group-inline">
-                    <label>NIDN</label>
+                    <label>NIDN *</label>
                     <input type="text" name="nidn" required>
                 </div>
                 <div class="form-group-inline">
-                    <label>Nama Lengkap</label>
+                    <label>Nama Lengkap *</label>
                     <input type="text" name="nama" required>
                 </div>
                 <div class="form-group-inline">
-                    <label>Jenis Kelamin</label>
+                    <label>Jenis Kelamin *</label>
                     <select name="jenis_kelamin" required>
                         <option value="L">Laki-laki</option>
                         <option value="P">Perempuan</option>
                     </select>
                 </div>
                 <div class="form-group-inline">
-                    <label>Jurusan</label>
+                    <label>Jurusan *</label>
                     <select name="jurusan_id" required>
                         <option value="1">Teknologi Informasi</option>
                         <option value="2">Teknik Elektro</option>
@@ -209,9 +292,12 @@ ob_start();
                         <td><?= $d->jenis_kelamin ?></td>
                         <td><?= $d->jurusan->nama ?? '-' ?></td>
                         <td>
-                            <a href="index.php?page=admin&action=delete_dosen&id=<?= $d->nidn ?>" 
-                               class="btn btn-danger btn-sm" 
-                               onclick="return confirm('Yakin hapus dosen ini?')">🗑️ Hapus</a>
+                            <div class="btn-group">
+                                <button onclick="editDosen('<?= $d->nidn ?>', '<?= htmlspecialchars($d->nama) ?>', '<?= $d->jenis_kelamin ?>', '<?= $d->jurusan_id ?>')" class="btn btn-warning btn-sm">✏️ Edit</button>
+                                <a href="index.php?page=admin&action=delete_dosen&id=<?= $d->nidn ?>" 
+                                   class="btn btn-danger btn-sm" 
+                                   onclick="return confirm('Yakin hapus dosen ini?')">🗑️ Hapus</a>
+                            </div>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -230,30 +316,30 @@ ob_start();
         <form action="index.php?page=admin&action=store_mhs" method="POST">
             <div class="form-inline">
                 <div class="form-group-inline">
-                    <label>NIM</label>
+                    <label>NIM *</label>
                     <input type="text" name="nim" required>
                 </div>
                 <div class="form-group-inline">
-                    <label>Nama Lengkap</label>
+                    <label>Nama Lengkap *</label>
                     <input type="text" name="nama" required>
                 </div>
                 <div class="form-group-inline">
-                    <label>Jenis Kelamin</label>
+                    <label>Jenis Kelamin *</label>
                     <select name="jenis_kelamin" required>
                         <option value="L">Laki-laki</option>
                         <option value="P">Perempuan</option>
                     </select>
                 </div>
                 <div class="form-group-inline">
-                    <label>Angkatan</label>
+                    <label>Angkatan *</label>
                     <input type="number" name="angkatan" value="<?= date('Y') - 2 ?>" required>
                 </div>
                 <div class="form-group-inline">
-                    <label>Kelas</label>
+                    <label>Kelas *</label>
                     <input type="text" name="kelas" placeholder="3A" required>
                 </div>
                 <div class="form-group-inline">
-                    <label>Program Studi</label>
+                    <label>Program Studi *</label>
                     <select name="prodi_id" required>
                         <option value="1">D4 TRPL</option>
                         <option value="2">D3 MI</option>
@@ -291,9 +377,12 @@ ob_start();
                         <td><span style="background:#e0f2fe;color:#0369a1;padding:4px 10px;border-radius:6px;font-weight:600;font-size:12px;"><?= $m->kelas_profil ?></span></td>
                         <td><?= $m->prodi->nama ?? '-' ?></td>
                         <td>
-                            <a href="index.php?page=admin&action=delete_mhs&id=<?= $m->nim ?>" 
-                               class="btn btn-danger btn-sm" 
-                               onclick="return confirm('Yakin hapus mahasiswa ini?')">🗑️ Hapus</a>
+                            <div class="btn-group">
+                                <button onclick="editMahasiswa('<?= $m->nim ?>', '<?= htmlspecialchars($m->nama) ?>', '<?= $m->jenis_kelamin ?>', '<?= $m->angkatan ?>', '<?= $m->kelas_profil ?>', '<?= $m->prodi_id ?>')" class="btn btn-warning btn-sm">✏️ Edit</button>
+                                <a href="index.php?page=admin&action=delete_mhs&id=<?= $m->nim ?>" 
+                                   class="btn btn-danger btn-sm" 
+                                   onclick="return confirm('Yakin hapus mahasiswa ini?')">🗑️ Hapus</a>
+                            </div>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -312,15 +401,15 @@ ob_start();
         <form action="index.php?page=admin&action=store_mk" method="POST">
             <div class="form-inline">
                 <div class="form-group-inline">
-                    <label>Kode MK</label>
+                    <label>Kode MK *</label>
                     <input type="text" name="kode_mk" required>
                 </div>
                 <div class="form-group-inline">
-                    <label>Nama Matakuliah</label>
+                    <label>Nama Matakuliah *</label>
                     <input type="text" name="nama_mk" required>
                 </div>
                 <div class="form-group-inline">
-                    <label>SKS</label>
+                    <label>SKS *</label>
                     <input type="number" name="sks" min="1" max="6" required>
                 </div>
                 <div class="form-group-inline">
@@ -328,7 +417,7 @@ ob_start();
                     <input type="number" name="semester_paket" min="1" max="8">
                 </div>
                 <div class="form-group-inline">
-                    <label>Program Studi</label>
+                    <label>Program Studi *</label>
                     <select name="prodi_id" required>
                         <option value="1">D4 TRPL</option>
                         <option value="2">D3 MI</option>
@@ -364,9 +453,12 @@ ob_start();
                         <td><?= $mk->semester_paket ?? '-' ?></td>
                         <td><?= $mk->prodi->nama ?? '-' ?></td>
                         <td>
-                            <a href="index.php?page=admin&action=delete_mk&id=<?= $mk->id ?>" 
-                               class="btn btn-danger btn-sm" 
-                               onclick="return confirm('Yakin hapus matakuliah ini?')">🗑️ Hapus</a>
+                            <div class="btn-group">
+                                <button onclick="editMatakuliah('<?= $mk->id ?>', '<?= htmlspecialchars($mk->kode_mk) ?>', '<?= htmlspecialchars($mk->nama_mk) ?>', '<?= $mk->sks ?>', '<?= $mk->semester_paket ?>', '<?= $mk->prodi_id ?>')" class="btn btn-warning btn-sm">✏️ Edit</button>
+                                <a href="index.php?page=admin&action=delete_mk&id=<?= $mk->id ?>" 
+                                   class="btn btn-danger btn-sm" 
+                                   onclick="return confirm('Yakin hapus matakuliah ini?')">🗑️ Hapus</a>
+                            </div>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -385,16 +477,16 @@ ob_start();
         <form action="index.php?page=admin&action=store_ruangan" method="POST">
             <div class="form-inline">
                 <div class="form-group-inline">
-                    <label>Kode Ruang</label>
+                    <label>Kode Ruang *</label>
                     <input type="text" name="kode_ruang" required>
                 </div>
                 <div class="form-group-inline">
-                    <label>Nama Ruang</label>
+                    <label>Nama Ruang *</label>
                     <input type="text" name="nama_ruang" required>
                 </div>
                 <div class="form-group-inline">
-                    <label>Kapasitas</label>
-                    <input type="number" name="kapasitas" value="40">
+                    <label>Kapasitas *</label>
+                    <input type="number" name="kapasitas" value="40" required>
                 </div>
             </div>
             <button type="submit" class="btn btn-primary">💾 Simpan Ruangan</button>
@@ -422,9 +514,12 @@ ob_start();
                         <td><?= $r->nama_ruang ?></td>
                         <td><?= $r->kapasitas ?> orang</td>
                         <td>
-                            <a href="index.php?page=admin&action=delete_ruangan&id=<?= $r->id ?>" 
-                               class="btn btn-danger btn-sm" 
-                               onclick="return confirm('Yakin hapus ruangan ini?')">🗑️ Hapus</a>
+                            <div class="btn-group">
+                                <button onclick="editRuangan('<?= $r->id ?>', '<?= htmlspecialchars($r->kode_ruang) ?>', '<?= htmlspecialchars($r->nama_ruang) ?>', '<?= $r->kapasitas ?>')" class="btn btn-warning btn-sm">✏️ Edit</button>
+                                <a href="index.php?page=admin&action=delete_ruangan&id=<?= $r->id ?>" 
+                                   class="btn btn-danger btn-sm" 
+                                   onclick="return confirm('Yakin hapus ruangan ini?')">🗑️ Hapus</a>
+                            </div>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -471,23 +566,144 @@ ob_start();
     </div>
 </div>
 
+<!-- MODAL EDIT MATAKULIAH -->
+<div id="modalEditMatakuliah" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>✏️ Edit Data Matakuliah</h3>
+            <span class="close" onclick="closeModal('modalEditMatakuliah')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form action="index.php?page=admin&action=update_mk" method="POST">
+                <input type="hidden" name="id" id="edit_mk_id">
+                <div class="form-group-inline" style="margin-bottom: 15px;">
+                    <label>Kode MK *</label>
+                    <input type="text" name="kode_mk" id="edit_mk_kode" required>
+                </div>
+                <div class="form-group-inline" style="margin-bottom: 15px;">
+                    <label>Nama Matakuliah *</label>
+                    <input type="text" name="nama_mk" id="edit_mk_nama" required>
+                </div>
+                <div class="form-group-inline" style="margin-bottom: 15px;">
+                    <label>SKS *</label>
+                    <input type="number" name="sks" id="edit_mk_sks" min="1" max="6" required>
+                </div>
+                <div class="form-group-inline" style="margin-bottom: 15px;">
+                    <label>Semester Paket</label>
+                    <input type="number" name="semester_paket" id="edit_mk_semester" min="1" max="8">
+                </div>
+                <div class="form-group-inline" style="margin-bottom: 20px;">
+                    <label>Program Studi *</label>
+                    <select name="prodi_id" id="edit_mk_prodi" required>
+                        <option value="1">D4 TRPL</option>
+                        <option value="2">D3 MI</option>
+                    </select>
+                </div>
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">💾 Update Data</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modalEditMatakuliah')">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDIT RUANGAN -->
+<div id="modalEditRuangan" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>✏️ Edit Data Ruangan</h3>
+            <span class="close" onclick="closeModal('modalEditRuangan')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form action="index.php?page=admin&action=update_ruangan" method="POST">
+                <input type="hidden" name="id" id="edit_ruangan_id">
+                <div class="form-group-inline" style="margin-bottom: 15px;">
+                    <label>Kode Ruang *</label>
+                    <input type="text" name="kode_ruang" id="edit_ruangan_kode" required>
+                </div>
+                <div class="form-group-inline" style="margin-bottom: 15px;">
+                    <label>Nama Ruang *</label>
+                    <input type="text" name="nama_ruang" id="edit_ruangan_nama" required>
+                </div>
+                <div class="form-group-inline" style="margin-bottom: 20px;">
+                    <label>Kapasitas *</label>
+                    <input type="number" name="kapasitas" id="edit_ruangan_kapasitas" required>
+                </div>
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">💾 Update Data</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modalEditRuangan')">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
 function showTab(tabName, event) {
     event.preventDefault();
-    
-    // Hide all tabs
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.remove('active');
     });
-    
-    // Remove active class from all tab buttons
     document.querySelectorAll('.admin-tab').forEach(tab => {
         tab.classList.remove('active');
     });
-    
-    // Show selected tab
     document.getElementById('tab-' + tabName).classList.add('active');
     event.target.classList.add('active');
+}
+
+// Edit Dosen
+function editDosen(nidn, nama, jk, jurusan) {
+    document.getElementById('edit_dosen_nidn').value = nidn;
+    document.getElementById('edit_dosen_nidn_display').value = nidn;
+    document.getElementById('edit_dosen_nama').value = nama;
+    document.getElementById('edit_dosen_jk').value = jk;
+    document.getElementById('edit_dosen_jurusan').value = jurusan;
+    document.getElementById('modalEditDosen').style.display = 'block';
+}
+
+// Edit Mahasiswa
+function editMahasiswa(nim, nama, jk, angkatan, kelas, prodi) {
+    document.getElementById('edit_mhs_nim').value = nim;
+    document.getElementById('edit_mhs_nim_display').value = nim;
+    document.getElementById('edit_mhs_nama').value = nama;
+    document.getElementById('edit_mhs_jk').value = jk;
+    document.getElementById('edit_mhs_angkatan').value = angkatan;
+    document.getElementById('edit_mhs_kelas').value = kelas;
+    document.getElementById('edit_mhs_prodi').value = prodi;
+    document.getElementById('modalEditMahasiswa').style.display = 'block';
+}
+
+// Edit Matakuliah
+function editMatakuliah(id, kode, nama, sks, semester, prodi) {
+    document.getElementById('edit_mk_id').value = id;
+    document.getElementById('edit_mk_kode').value = kode;
+    document.getElementById('edit_mk_nama').value = nama;
+    document.getElementById('edit_mk_sks').value = sks;
+    document.getElementById('edit_mk_semester').value = semester || '';
+    document.getElementById('edit_mk_prodi').value = prodi;
+    document.getElementById('modalEditMatakuliah').style.display = 'block';
+}
+
+// Edit Ruangan
+function editRuangan(id, kode, nama, kapasitas) {
+    document.getElementById('edit_ruangan_id').value = id;
+    document.getElementById('edit_ruangan_kode').value = kode;
+    document.getElementById('edit_ruangan_nama').value = nama;
+    document.getElementById('edit_ruangan_kapasitas').value = kapasitas;
+    document.getElementById('modalEditRuangan').style.display = 'block';
+}
+
+// Close Modal
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+    }
 }
 </script>
 
@@ -495,3 +711,93 @@ function showTab(tabName, event) {
 $content = ob_get_clean();
 require '../views/layouts/app.php';
 ?>
+<div id="modalEditDosen" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>✏️ Edit Data Dosen</h3>
+            <span class="close" onclick="closeModal('modalEditDosen')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form action="index.php?page=admin&action=update_dosen" method="POST">
+                <input type="hidden" name="nidn" id="edit_dosen_nidn">
+                <div class="form-group-inline" style="margin-bottom: 15px;">
+                    <label>NIDN</label>
+                    <input type="text" id="edit_dosen_nidn_display" disabled style="background: #f1f5f9;">
+                </div>
+                <div class="form-group-inline" style="margin-bottom: 15px;">
+                    <label>Nama Lengkap *</label>
+                    <input type="text" name="nama" id="edit_dosen_nama" required>
+                </div>
+                <div class="form-group-inline" style="margin-bottom: 15px;">
+                    <label>Jenis Kelamin *</label>
+                    <select name="jenis_kelamin" id="edit_dosen_jk" required>
+                        <option value="L">Laki-laki</option>
+                        <option value="P">Perempuan</option>
+                    </select>
+                </div>
+                <div class="form-group-inline" style="margin-bottom: 20px;">
+                    <label>Jurusan *</label>
+                    <select name="jurusan_id" id="edit_dosen_jurusan" required>
+                        <option value="1">Teknologi Informasi</option>
+                        <option value="2">Teknik Elektro</option>
+                    </select>
+                </div>
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">💾 Update Data</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modalEditDosen')">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDIT MAHASISWA -->
+<div id="modalEditMahasiswa" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>✏️ Edit Data Mahasiswa</h3>
+            <span class="close" onclick="closeModal('modalEditMahasiswa')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form action="index.php?page=admin&action=update_mhs" method="POST">
+                <input type="hidden" name="nim" id="edit_mhs_nim">
+                <div class="form-group-inline" style="margin-bottom: 15px;">
+                    <label>NIM</label>
+                    <input type="text" id="edit_mhs_nim_display" disabled style="background: #f1f5f9;">
+                </div>
+                <div class="form-group-inline" style="margin-bottom: 15px;">
+                    <label>Nama Lengkap *</label>
+                    <input type="text" name="nama" id="edit_mhs_nama" required>
+                </div>
+                <div class="form-group-inline" style="margin-bottom: 15px;">
+                    <label>Jenis Kelamin *</label>
+                    <select name="jenis_kelamin" id="edit_mhs_jk" required>
+                        <option value="L">Laki-laki</option>
+                        <option value="P">Perempuan</option>
+                    </select>
+                </div>
+                <div class="form-group-inline" style="margin-bottom: 15px;">
+                    <label>Angkatan *</label>
+                    <input type="number" name="angkatan" id="edit_mhs_angkatan" required>
+                </div>
+                <div class="form-group-inline" style="margin-bottom: 15px;">
+                    <label>Kelas *</label>
+                    <input type="text" name="kelas" id="edit_mhs_kelas" required>
+                </div>
+                <div class="form-group-inline" style="margin-bottom: 20px;">
+                    <label>Program Studi *</label>
+                    <select name="prodi_id" id="edit_mhs_prodi" required>
+                        <option value="1">D4 TRPL</option>
+                        <option value="2">D3 MI</option>
+                    </select>
+                </div>
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">💾 Update Data</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modalEditMahasiswa')">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL

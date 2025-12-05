@@ -110,12 +110,16 @@ try {
             $controller = new App\Controllers\AdminController();
             switch ($action) {
                 case 'store_dosen': $controller->storeDosen(); break;
+                case 'update_dosen': $controller->updateDosen(); break;
                 case 'delete_dosen': $controller->deleteDosen(); break;
                 case 'store_mhs': $controller->storeMahasiswa(); break;
+                case 'update_mhs': $controller->updateMahasiswa(); break;
                 case 'delete_mhs': $controller->deleteMahasiswa(); break;
                 case 'store_mk': $controller->storeMatakuliah(); break;
+                case 'update_mk': $controller->updateMatakuliah(); break;
                 case 'delete_mk': $controller->deleteMatakuliah(); break;
                 case 'store_ruangan': $controller->storeRuangan(); break;
+                case 'update_ruangan': $controller->updateRuangan(); break;
                 case 'delete_ruangan': $controller->deleteRuangan(); break;
                 default: $controller->index();
             }

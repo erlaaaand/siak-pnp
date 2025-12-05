@@ -34,7 +34,31 @@ class AdminController {
         } catch (\Exception $e) {
             $_SESSION['error'] = 'Gagal menambahkan dosen: ' . $e->getMessage();
         }
-        header("Location: index.php?page=admin");
+        header("Location: index.php?page=dashboard");
+        exit;
+    }
+
+    public function updateDosen() {
+        try {
+            $nidn = $_POST['nidn'];
+            $dosen = Dosen::where('nidn', $nidn)->first();
+            
+            if (!$dosen) {
+                $_SESSION['error'] = 'Dosen tidak ditemukan!';
+                header("Location: index.php?page=dashboard");
+                exit;
+            }
+
+            $dosen->nama = $_POST['nama'];
+            $dosen->jenis_kelamin = $_POST['jenis_kelamin'];
+            $dosen->jurusan_id = $_POST['jurusan_id'];
+            $dosen->save();
+
+            $_SESSION['success'] = 'Data dosen berhasil diupdate!';
+        } catch (\Exception $e) {
+            $_SESSION['error'] = 'Gagal mengupdate dosen: ' . $e->getMessage();
+        }
+        header("Location: index.php?page=dashboard");
         exit;
     }
 
@@ -46,7 +70,7 @@ class AdminController {
         } catch (\Exception $e) {
             $_SESSION['error'] = 'Gagal menghapus dosen: ' . $e->getMessage();
         }
-        header("Location: index.php?page=admin");
+        header("Location: index.php?page=dashboard");
         exit;
     }
 
@@ -66,7 +90,33 @@ class AdminController {
         } catch (\Exception $e) {
             $_SESSION['error'] = 'Gagal menambahkan mahasiswa: ' . $e->getMessage();
         }
-        header("Location: index.php?page=admin");
+        header("Location: index.php?page=dashboard");
+        exit;
+    }
+
+    public function updateMahasiswa() {
+        try {
+            $nim = $_POST['nim'];
+            $mahasiswa = Mahasiswa::where('nim', $nim)->first();
+            
+            if (!$mahasiswa) {
+                $_SESSION['error'] = 'Mahasiswa tidak ditemukan!';
+                header("Location: index.php?page=dashboard");
+                exit;
+            }
+
+            $mahasiswa->nama = $_POST['nama'];
+            $mahasiswa->jenis_kelamin = $_POST['jenis_kelamin'];
+            $mahasiswa->angkatan = $_POST['angkatan'];
+            $mahasiswa->kelas_profil = $_POST['kelas'];
+            $mahasiswa->prodi_id = $_POST['prodi_id'];
+            $mahasiswa->save();
+
+            $_SESSION['success'] = 'Data mahasiswa berhasil diupdate!';
+        } catch (\Exception $e) {
+            $_SESSION['error'] = 'Gagal mengupdate mahasiswa: ' . $e->getMessage();
+        }
+        header("Location: index.php?page=dashboard");
         exit;
     }
 
@@ -78,7 +128,7 @@ class AdminController {
         } catch (\Exception $e) {
             $_SESSION['error'] = 'Gagal menghapus mahasiswa: ' . $e->getMessage();
         }
-        header("Location: index.php?page=admin");
+        header("Location: index.php?page=dashboard");
         exit;
     }
 
@@ -96,7 +146,33 @@ class AdminController {
         } catch (\Exception $e) {
             $_SESSION['error'] = 'Gagal menambahkan matakuliah: ' . $e->getMessage();
         }
-        header("Location: index.php?page=admin");
+        header("Location: index.php?page=dashboard");
+        exit;
+    }
+
+    public function updateMatakuliah() {
+        try {
+            $id = $_POST['id'];
+            $matakuliah = Matakuliah::find($id);
+            
+            if (!$matakuliah) {
+                $_SESSION['error'] = 'Matakuliah tidak ditemukan!';
+                header("Location: index.php?page=dashboard");
+                exit;
+            }
+
+            $matakuliah->kode_mk = $_POST['kode_mk'];
+            $matakuliah->nama_mk = $_POST['nama_mk'];
+            $matakuliah->sks = $_POST['sks'];
+            $matakuliah->semester_paket = $_POST['semester_paket'] ?? null;
+            $matakuliah->prodi_id = $_POST['prodi_id'];
+            $matakuliah->save();
+
+            $_SESSION['success'] = 'Data matakuliah berhasil diupdate!';
+        } catch (\Exception $e) {
+            $_SESSION['error'] = 'Gagal mengupdate matakuliah: ' . $e->getMessage();
+        }
+        header("Location: index.php?page=dashboard");
         exit;
     }
 
@@ -108,7 +184,7 @@ class AdminController {
         } catch (\Exception $e) {
             $_SESSION['error'] = 'Gagal menghapus matakuliah: ' . $e->getMessage();
         }
-        header("Location: index.php?page=admin");
+        header("Location: index.php?page=dashboard");
         exit;
     }
 
@@ -124,7 +200,31 @@ class AdminController {
         } catch (\Exception $e) {
             $_SESSION['error'] = 'Gagal menambahkan ruangan: ' . $e->getMessage();
         }
-        header("Location: index.php?page=admin");
+        header("Location: index.php?page=dashboard");
+        exit;
+    }
+
+    public function updateRuangan() {
+        try {
+            $id = $_POST['id'];
+            $ruangan = Ruangan::find($id);
+            
+            if (!$ruangan) {
+                $_SESSION['error'] = 'Ruangan tidak ditemukan!';
+                header("Location: index.php?page=dashboard");
+                exit;
+            }
+
+            $ruangan->kode_ruang = $_POST['kode_ruang'];
+            $ruangan->nama_ruang = $_POST['nama_ruang'];
+            $ruangan->kapasitas = $_POST['kapasitas'];
+            $ruangan->save();
+
+            $_SESSION['success'] = 'Data ruangan berhasil diupdate!';
+        } catch (\Exception $e) {
+            $_SESSION['error'] = 'Gagal mengupdate ruangan: ' . $e->getMessage();
+        }
+        header("Location: index.php?page=dashboard");
         exit;
     }
 
@@ -136,7 +236,7 @@ class AdminController {
         } catch (\Exception $e) {
             $_SESSION['error'] = 'Gagal menghapus ruangan: ' . $e->getMessage();
         }
-        header("Location: index.php?page=admin");
+        header("Location: index.php?page=dashboard");
         exit;
     }
 }
