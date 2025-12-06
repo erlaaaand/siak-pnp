@@ -11,9 +11,17 @@ class Mahasiswa extends Model {
     public $incrementing = false;
     protected $keyType = 'string';
     protected $fillable = [
-        'nim', 'user_id', 'nama', 'tempat_lahir', 
-        'tanggal_lahir', 'jenis_kelamin', 'prodi_id', 
-        'angkatan', 'foto'
+        'nim', 
+        'user_id', 
+        'nama', 
+        'tempat_lahir', 
+        'tanggal_lahir', 
+        'jenis_kelamin', 
+        'prodi_id', 
+        'angkatan', 
+        'foto',
+        'kelas_profil',   // <--- DITAMBAHKAN (Sesuai nama kolom di tabel)
+        'semester_aktif'  // <--- DITAMBAHKAN (Agar bisa diisi manual lewat create)
     ];
 
     protected $dates = ['tanggal_lahir', 'deleted_at'];
